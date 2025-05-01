@@ -1,6 +1,7 @@
 name: Send Daily WhatsApp Message
 
 on:
+  workflow_dispatch:
   schedule:
     - cron: "0 7 * * *"  # Every day at 07:00 UTC
 
@@ -17,8 +18,8 @@ jobs:
         with:
           python-version: "3.10"
 
-      - name: Install Twilio
-        run: pip install twilio
+      - name: Install requirements
+        run: pip install -r whatsApp/requirements.txt
 
       - name: Run message script
         env:
