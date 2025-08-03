@@ -1,23 +1,20 @@
-import google.generativeai as genai
+import os
 from datetime import datetime
+import google.generativeai as genai
 
-# ==== CONFIG ====
-GEMINI_API_KEY = "AIzaSyDf10DPyyUznL0KXSYb6geooZdgyhfsEZ8"
+# Setup
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+model = genai.GenerativeModel("gemini-pro")
 
-# ==== SETUP GEMINI ====
-genai.configure(api_key=GEMINI_API_KEY)
-model = genai.GenerativeModel("gemini-2.5-flash")
+today = datetime.now().strftime("%Y-%m-%d")
+filename = f"daily_mantra_{today}.txt"
 
-# ==== GENERATE MANTRA ====
 prompt = "Generate a short, uplifting, positive mantra to start the day with a good mindset."
 response = model.generate_content(prompt)
 mantra = response.text.strip()
 
-# ==== SAVE TO TEXT FILE ====
-today = datetime.now().strftime("%Y-%m-%d")
-filename = f"daily_mantra_{today}.txt"
-
+# Save mantra to file
 with open(filename, "w", encoding="utf-8") as f:
     f.write(f"🌞 Daily Mantra for {today}\n\n{mantra}")
 
-print(f"✅ Mantra saved to: {filename}")
+print(f"Saved mantra to {filename}")
