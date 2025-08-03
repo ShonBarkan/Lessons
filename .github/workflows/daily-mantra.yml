@@ -1,0 +1,83 @@
+name: Daily Mantra Generator
+
+on:
+  workflow_dispatch:         # manual trigger
+  schedule:
+    - cron: '30 7 * * *'     # every day at 07:30 UTC
+
+jobs:
+  generate-mantra:
+    runs-on: ubuntu-latest
+
+    env:
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      EMAIL: ${{ secrets.EMAIL }}
+      EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+      SEND_TO_VAYYAR_USER: ${{ secrets.SEND_TO_VAYYAR_USER }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run mantra generator script
+        id: generate
+        run: |
+          python scripts/generate_mantra.py
+
+      - name: Locate output file
+        id: find_file
+        run: |
+          echo "file=$(ls daily_mantra_*.txt)" >> $GITHUB_OUTPUT
+
+      - name: Read file content
+        id: read_content
+        run: |
+          content=$(cat ${{ steps.find_file.outputs.file }})
+          echo "content<<EOF" >> $GITHUB_OUTPUT
+          echo "$content" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Send daily mantra email
+        uses: dawidd6/action-send-mail@v2
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.EMAIL }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: 🌞 Your Daily Mantra
+          to: ${{ secrets.SEND_TO_VAYYAR_USER }}
+          from: ${{ secrets.EMAIL }}
+          body: ${{ steps.read_content.outputs.content }}
+
+      - name: Upload mantra file as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: daily-mantra
+          path: ${{ steps.find_file.outputs.file }}
+
+      - name: Send failure mail
+        if: failure()
+        uses: dawidd6/action-send-mail@v2
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.EMAIL }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: ❌ Daily Mantra Action Failed
+          to: ${{ secrets.EMAIL }}
+          from: ${{ secrets.EMAIL }}
+          body: |
+            The GitHub Action to generate and send the daily mantra has failed.
+
+            View logs: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
