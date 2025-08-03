@@ -31,7 +31,7 @@ jobs:
       - name: Run mantra generator script
         id: generate
         run: |
-          python scripts/generate_mantra.py
+          python gemini_action/generate_mantra.py
 
       - name: Locate output file
         id: find_file
