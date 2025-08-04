@@ -1,7 +1,11 @@
 name: Daily Mantra Generator
 
 on:
-  workflow_dispatch:         # manual trigger
+  workflow_dispatch:
+    inputs:
+      SEND_TO_VAYYAR_USER:
+        description: 'Recipient email for daily mantra'
+        required: false
   schedule:
     - cron: '30 7 * * *'     # every day at 07:30 UTC
 
@@ -13,7 +17,7 @@ jobs:
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
       EMAIL: ${{ secrets.EMAIL }}
       EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
-      SEND_TO_VAYYAR_USER: ${{ secrets.SEND_TO_VAYYAR_USER }}
+      SEND_TO_VAYYAR_USER: ${{ github.event.inputs.SEND_TO_VAYYAR_USER != '' && github.event.inputs.SEND_TO_VAYYAR_USER || secrets.SEND_TO_VAYYAR_USER }}
 
     steps:
       - name: Checkout repository
