@@ -4,7 +4,7 @@ import google.generativeai as genai
 
 # Setup
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-model = genai.GenerativeModel("gemini-pro")
+model = genai.GenerativeModel("gemini-2.0-flash")
 
 today = datetime.now().strftime("%Y-%m-%d")
 filename = f"daily_mantra_{today}.txt"
