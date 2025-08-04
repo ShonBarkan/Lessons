@@ -51,7 +51,6 @@ jobs:
         with:
           server_address: smtp.gmail.com
           server_port: 465
-          secure: true
           username: ${{ secrets.EMAIL }}
           password: ${{ secrets.EMAIL_PASSWORD }}
           subject: 🌞 Your Daily Mantra
@@ -71,7 +70,6 @@ jobs:
         with:
           server_address: smtp.gmail.com
           server_port: 465
-          secure: true
           username: ${{ secrets.EMAIL }}
           password: ${{ secrets.EMAIL_PASSWORD }}
           subject: ❌ Daily Mantra Action Failed
@@ -79,5 +77,4 @@ jobs:
           from: ${{ secrets.EMAIL }}
           body: |
             The GitHub Action to generate and send the daily mantra has failed.
-
             View logs: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
